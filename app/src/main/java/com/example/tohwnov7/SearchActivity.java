@@ -47,6 +47,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             // Get a reference to our posts
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference ref = database.getReference("tohw4-6edf7/" + zipCode);
+            //comment
 
         }
     }
