@@ -1,9 +1,13 @@
 package com.example.tohwnov7;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -77,5 +81,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         }
 
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_nav, menu);
+
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+
+        if (item.getItemId() == R.id.menuSearch){
+            Intent goToSearch = new Intent(this, SearchActivity.class);
+            startActivity(goToSearch);
+        } else if (item.getItemId() == R.id.menuGoToBird) {
+           //do nothing, already on bird report
+        } else if (item.getItemId() == R.id.menuLogout) {
+            Intent logoutIntent = new Intent(this, loginActivity.class);
+            startActivity(logoutIntent);
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
