@@ -69,10 +69,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (!email.equals(userInpEmail)) {
                 Toast.makeText(MainActivity.this, "Error, email you entered must match current user", Toast.LENGTH_LONG).show();
             } else {
-                DatabaseReference myRef = database.getReference(zipCode);
+                DatabaseReference myRef = database.getReference("birds");
 
                 Bird birdEntry = new Bird(birdName, zipCode, personalName, email, importance);
-                myRef.setValue(birdEntry);
+                myRef.push().setValue(birdEntry);
                 Toast.makeText(MainActivity.this, "Bird entered", Toast.LENGTH_LONG).show();
             }
 

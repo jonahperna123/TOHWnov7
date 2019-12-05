@@ -1,6 +1,7 @@
 package com.example.tohwnov7;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +30,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     EditText editTextSearchZip;
     Button buttonSearchZip, buttonGoToReport, buttonLike;
     TextView textViewPersonName, textViewBirdName;
+    int importance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View view) {
         Intent goToReport = new Intent(this, MainActivity.class);
-        String zipCode = editTextSearchZip.getText().toString();
+        String zipCodeSearch = editTextSearchZip.getText().toString();
 
 
         if (view == buttonGoToReport) {
@@ -59,54 +62,92 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             //search firebase for the DB
 
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference(zipCode);
+            DatabaseReference myRef = database.getReference("birds");
 
-            myRef.addValueEventListener(new ValueEventListener() {
+            myRef.orderByChild("zipCode").equalTo(zipCodeSearch).addChildEventListener(new ChildEventListener() {
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    // This method is called once with the initial value and again
-                    // whenever data at this location is updated.
-                    Bird value = dataSnapshot.getValue(Bird.class);
+                public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                    textViewBirdName.setText(value.birdName);
-                    textViewPersonName.setText(value.personName);
+
+                    Bird searchValue = dataSnapshot.getValue(Bird.class);
+
+                    textViewBirdName.setText(searchValue.birdName);
+                    textViewPersonName.setText(searchValue.personName);
+
                 }
 
                 @Override
-                public void onCancelled(DatabaseError error) {
+                public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+
                 }
             });
 
         } else if (view == buttonLike) {
 
-            if (zipCode.equals("")) {
+            if (zipCodeSearch.equals("")) {
                 Toast.makeText(SearchActivity.this, "please enter a valid zipcode first", LENGTH_LONG).show();
             } else {
 
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                final DatabaseReference myRef = database.getReference(zipCode);
+                //search firebase for the DB
 
-                myRef.addValueEventListener(new ValueEventListener() {
+                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                final DatabaseReference myRef = database.getReference("birds");
+
+                myRef.orderByChild("zipCode").equalTo(zipCodeSearch).addChildEventListener(new ChildEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        // This method is called once with the initial value and again
-                        // whenever data at this location is updated.
-                        Bird value = dataSnapshot.getValue(Bird.class);
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
 
-                        textViewBirdName.setText(value.birdName);
-                        textViewPersonName.setText(value.personName);
-                        int importance = value.importance;
-//                        ++importance;
-//                        Bird updatedBird = new Bird(value.birdName, value.zipCode, value.personName, value.email, importance);
-//                        myRef.setValue(updatedBird);
-//                        Toast.makeText(SearchActivity.this, "importance added", Toast.LENGTH_LONG).show();
+
+                        Bird searchValue = dataSnapshot.getValue(Bird.class);
+                        String myKey = dataSnapshot.getKey();
+
+                        textViewBirdName.setText(searchValue.birdName);
+                        textViewPersonName.setText(searchValue.personName);
+                        importance = searchValue.importance + 1;
+
+
+                        myRef.child(myKey).child("importance").setValue(importance);
+
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError error) {
+                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
                     }
                 });
 
+                //myRef.setValue(currentBird);
+                Toast.makeText(SearchActivity.this, "importance added", Toast.LENGTH_LONG).show();
 
 
             }
